@@ -1,118 +1,33 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>AR Business Card</title>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant AR Card</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
     <style>
-        /* 全体のレイアウト設定 */
-        body {
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            overflow: hidden;
-        }
-
-        /* AR起動カードのデザイン */
-        .ar-card {
-            width: 80%;
-            max-width: 300px;
-            padding: 50px 20px;
-            background: rgba(255, 255, 255, 0.85);
-            border-radius: 40px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
-            text-align: center;
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.5);
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            text-decoration: none;
-            display: block;
-        }
-
-        /* タップ時の反応 */
-        .ar-card:active {
-            transform: scale(0.92);
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-        /* ふわふわ浮くアイコンのアニメーション */
-        .ar-icon {
-            font-size: 80px;
-            margin-bottom: 25px;
-            display: inline-block;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-15px) rotate(5deg); }
-        }
-
-        /* テキストのデザイン */
-        .ar-text strong {
-            display: block;
-            font-size: 22px;
-            color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .ar-text span {
-            display: inline-block;
-            font-size: 14px;
-            color: #3498db;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            border: 2px solid #3498db;
-            padding: 8px 16px;
-            border-radius: 20px;
-            margin-top: 10px;
-        }
-
-        /* コピーライトなどの補足 */
-        .footer {
-            position: absolute;
-            bottom: 30px;
-            font-size: 12px;
-            color: #7f8c8d;
-        }
+      body { margin: 0; overflow: hidden; }
+      /* 読み込み中の待機画面 */
+      #scanning-overlay {
+        display: flex; align-items: center; justify-content: center;
+        position: absolute; left: 0; right: 0; top: 0; bottom: 0;
+        background: rgba(0,0,0,0.5); color: white; z-index: 2;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
+    <div id="scanning-overlay">名刺QRにかざしてください...</div>
 
-    <a id="ar-link" rel="ar" href="hoshinoAR0221.usdz" class="ar-card">
-        <div class="ar-icon">👤</div> <div class="ar-text">
-            <strong>名刺から本人が登場！</strong>
-            <span>Tap to AR</span>
-        </div>
-    </a>
+    <a-scene mindar-image="imageTargetSrc: ./targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+      <a-assets>
+        <a-asset-item id="avatarModel" src="./hoshinoAR0221.glb"></a-asset-item>
+      </a-assets>
 
-    <div class="footer">AR Business Card Experience</div>
+      <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-    <script>
-        // デバイス判定とAndroid用URLの生成
-        const a = document.getElementById('ar-link');
-        const isAndroid = /android/i.test(navigator.userAgent);
-
-        if (isAndroid) {
-            // 現在のURLからモデルの絶対パスを作成
-            const baseUrl = window.location.href.substring(0, window.location.href.lastIndexOf('/') + 1);
-            const modelUrl = baseUrl + 'hoshinoAR0221.glb';
-            
-            // Android専用のIntentリンクに書き換え
-            // mode=ar_only にすることで、3Dビューアを飛ばして直接カメラを起動させます
-            const sceneViewerUrl = `intent://arvr.google.com/scene-viewer/1.0?file=${modelUrl}&mode=ar_only#Intent;scheme=https;package=google.ar.core;action=android.intent.action.VIEW;S.browser_fallback_url=https://developers.google.com/ar;end;`;
-            
-            a.setAttribute('href', sceneViewerUrl);
-            a.removeAttribute('rel'); 
-        }
-    </script>
-</body>
+      <a-entity mindar-image-target="targetIndex: 0">
+        <a-gltf-model rotation="0 0 0" position="0 0 0" scale="0.5 0.5 0.5" src="#avatarModel"></a-gltf-model>
+      </a-entity>
+    </a-scene>
+  </body>
 </html>
