@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Business Card</title>
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
+    <style>
+        body { margin: 0; font-family: sans-serif; }
+        model-viewer {
+            width: 100vw;
+            height: 100vh;
+            background-color: #f0f0f0;
+        }
+        /* AR起動ボタンのカスタマイズ */
+        #ar-button {
+            background-color: #007bff;
+            border-radius: 30px;
+            border: none;
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 15px 30px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            cursor: pointer;
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+    <model-viewer 
+        src="hoshinoAR0221.glb" 
+        ios-src="hoshinoAR0221.usdz" 
+        alt="本人の3Dモデル" 
+        ar 
+        ar-modes="quick-look scene-viewer webxr" 
+        camera-controls 
+        auto-rotate
+        shadow-intensity="1"
+        environment-image="neutral"
+        exposure="1">
+        
+        <button slot="ar-button" id="ar-button">
+            👔 本人をARで表示する
+        </button>
+
+    </model-viewer>
+
+</body>
+</html>
