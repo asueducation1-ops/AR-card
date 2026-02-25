@@ -16,7 +16,7 @@
     </style>
   </head>
   <body>
-    <div id="scanning-overlay">名刺QRにかざしてください...</div>
+    <div id="scanning-overlay">名刺のQR部分にかざしてください...</div>
 
     <a-scene mindar-image="imageTargetSrc: ./targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
       <a-assets>
@@ -26,8 +26,8 @@
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
-        <a-gltf-model rotation="90  0  0" position="0 0 0" scale="2  2  2" src="#avatarModel"></a-gltf-model>
-      </a-entity>
+        <a-gltf-model rotation="45  0  0" position="0 0 0" scale="2  2  2" src="#avatarModel"></a-gltf-model>
+      </a-entity
     </a-scene>
   </body>
 </html>
