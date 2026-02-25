@@ -5,8 +5,8 @@
     <title>Instant AR Card</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-    
+    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
+
     <style>
       body { margin: 0; overflow: hidden; }
       #scanning-overlay {
@@ -19,20 +19,26 @@
   <body>
     <div id="scanning-overlay">名刺のQR部分にかざしてください...</div>
 
-    <a-scene mindar-image="imageTargetSrc: ./targets.mind;" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+    <a-scene 
+      mindar-image="imageTargetSrc: ./targets.mind; filterMinCF:0.001; filterBeta: 0.01;" 
+      color-space="sRGB" 
+      renderer="colorManagement: true, physicallyCorrectLights" 
+      vr-mode-ui="enabled: false" 
+      device-orientation-permission-ui="enabled: false">
+      
       <a-assets>
-        <a-asset-item id="avatarModel" src="./hoshinoAR0221.glb"></a-asset-item>
+        <a-asset-item id="avatarModel" src="./hoshinoAR0221.glb" crossorigin="anonymous"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
       <a-entity mindar-image-target="targetIndex: 0">
         <a-gltf-model 
-          rotation="0 0 0" 
-          position="0 0 0.2" 
-          scale="2 2 2" 
+          rotation="90 0 0" 
+          position="0 0 0.1" 
+          scale="1 1 1" 
           src="#avatarModel" 
-          animation-mixer="clip: *; loop: repeat;">
+          animation-mixer="clip: *; loop: repeat; timeScale: 1;">
         </a-gltf-model>
       </a-entity>
     </a-scene>
