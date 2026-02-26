@@ -1,66 +1,64 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AR Debug Mode</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
     <style>
-      body { margin: 0; overflow: hidden; }
-      #status-log {
-        position: fixed; top: 10px; left: 10px; padding: 10px;
-        background: rgba(0,0,0,0.8); color: #0f0; z-index: 1000;
-        font-family: monospace; font-size: 12px; pointer-events: none;
-      }
+        body { margin: 0; overflow: hidden; }
+        #debug-console {
+            position: fixed; top: 10px; left: 10px; right: 10px;
+            background: rgba(0,0,0,0.8); color: white;
+            padding: 10px; font-family: monospace; z-index: 9999;
+            font-size: 12px; line-height: 1.4; pointer-events: none;
+        }
     </style>
-  </head>
-  <body>
-    <div id="status-log">Status: Initializing...</div>
+</head>
+<body>
+    <div id="debug-console">ログ: 起動中...</div>
 
     <a-scene 
-      mindar-image="imageTargetSrc: ./targets.mind; autoStart: true;" 
-      color-space="sRGB" 
-      renderer="colorManagement: true, physicallyCorrectLights" 
-      vr-mode-ui="enabled: false" 
-      device-orientation-permission-ui="enabled: false">
-      
-      <a-camera position="0 0 0" look-controls="enabled: false" raycaster="objects: .clickable" cursor="fuse: false; rayOrigin: mouse;"></a-camera>
+        mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; uiScanning: no;" 
+        embedded color-space="sRGB" 
+        renderer="colorManagement: true, physicallyCorrectLights" 
+        vr-mode-ui="enabled: false" 
+        device-orientation-permission-ui="enabled: false">
+        
+        <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
-      <a-entity id="target" mindar-image-target="targetIndex: 0">
-        <a-box position="0 0 0" scale="0.5 0.5 0.5" color="red" class="clickable"></a-box>
-      </a-entity>
+        <a-entity id="target0" mindar-image-target="targetIndex: 0">
+            <a-sphere position="0 0 0" radius="1" color="blue" opacity="0.8"></a-sphere>
+        </a-entity>
     </a-scene>
 
     <script>
-      const log = document.getElementById('status-log');
-      const sceneEl = document.querySelector('a-scene');
+        const log = document.getElementById('debug-console');
+        const sceneEl = document.querySelector('a-scene');
 
-      // 1. MindARの準備が完了したか
-      sceneEl.addEventListener("arReady", () => {
-        log.innerText = "Status: AR Ready (Camera Active)";
-      });
+        // 1. MindARの初期化状況をチェック
+        sceneEl.addEventListener("arReady", () => {
+            log.innerHTML += "<br>✅ ARシステム起動完了";
+        });
 
-      // 2. エラーが発生したか
-      sceneEl.addEventListener("arError", (e) => {
-        log.style.color = "red";
-        log.innerText = "Status: AR Error! (Check HTTPS/Camera)";
-      });
+        sceneEl.addEventListener("arError", (e) => {
+            log.innerHTML += "<br>❌ ARエラー: HTTPSまたはカメラ権限を確認してください";
+        });
 
-      // 3. 画像を認識したか
-      const targetEl = document.querySelector('#target');
-      targetEl.addEventListener("targetFound", () => {
-        log.style.color = "yellow";
-        log.innerText = "Status: TARGET FOUND! Redirecting...";
-        // 認識したらすぐにURLへ飛ばす設定
-        setTimeout(() => {
-            window.location.href = 'https://asueducation1-ops.github.io/AR-card/';
-        }, 1000); // 1秒後に遷移
-      });
+        // 2. targets.mind が読み込めなかった時のエラーをキャッチ
+        window.addEventListener('error', (e) => {
+            if (e.target.src && e.target.src.includes('targets.mind')) {
+                log.innerHTML += "<br>❌ 重大エラー: targets.mind が見つかりません！パスを確認してください。";
+            }
+        }, true);
 
-      targetEl.addEventListener("targetLost", () => {
-        log.style.color = "#0f0";
-        log.innerText = "Status: Target Lost (Searching...)";
-      });
+        // 3. 認識テスト
+        const targetEl = document.querySelector('#target0');
+        targetEl.addEventListener("targetFound", () => {
+            log.innerHTML = "<span style='color:yellow; font-size:20px;'>✨ 認識成功！移動します...</span>";
+            setTimeout(() => {
+                window.location.href = 'https://asueducation1-ops.github.io/AR-card/';
+            }, 500);
+        });
     </script>
-  </body>
+</body>
 </html>
