@@ -2,28 +2,25 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Instant AR Card</title>
+    <title>AR Marker to URL</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/c-frame/aframe-extras@7.0.0/dist/aframe-extras.min.js"></script>
-
     <style>
       body { margin: 0; overflow: hidden; }
       #scanning-overlay {
+        position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.6); color: white;
         display: flex; align-items: center; justify-content: center;
-        position: fixed; left: 0; right: 0; top: 0; bottom: 0;
-        background: rgba(0,0,0,0.7); color: white; z-index: 999;
-        font-family: sans-serif;
+        z-index: 999; font-family: sans-serif;
       }
-      /* 認識した時にオーバーレイを隠すクラス */
       .hidden { display: none !important; }
     </style>
   </head>
   <body>
-    <div id="scanning-overlay">画像をカメラにかざしてください...</div>
+    <div id="scanning-overlay">指定の画像にかざしてください...</div>
 
     <a-scene 
-      mindar-image="imageTargetSrc: ./targets.mind; uiScanning: #scanning-overlay; filterMinCF:0.0001; filterBeta: 0.001;" 
+      mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; uiScanning: #scanning-overlay;" 
       color-space="sRGB" 
       renderer="colorManagement: true, physicallyCorrectLights" 
       vr-mode-ui="enabled: false" 
@@ -33,34 +30,41 @@
         <a-asset-item id="avatarModel" src="./hoshinoAR0221.glb"></a-asset-item>
       </a-assets>
 
-      <a-camera position="0 0 0" look-controls="enabled: false" cursor="fuse: false; rayOrigin: mouse;" raycaster="far: ${customFields.lib7}; objects: .clickable"></a-camera>
+      <a-camera position="0 0 0" look-controls="enabled: false" raycaster="objects: .clickable" cursor="fuse: false; rayOrigin: mouse;"></a-camera>
 
-      <a-entity id="target" mindar-image-target="targetIndex: 0">
+      <a-entity mindar-image-target="targetIndex: 0">
         <a-gltf-model 
-          id="ar-model"
+          src="#avatarModel" 
           rotation="90 0 0" 
           position="0 0 0.1" 
-          scale="1 1 1" 
-          src="#avatarModel" 
-          animation-mixer>
+          scale="1 1 1">
         </a-gltf-model>
+
+        <a-plane 
+          id="link-button"
+          class="clickable"
+          position="0 -0.6 0.2" 
+          width="0.8" height="0.3" 
+          color="#007bff"
+          text="value: CLICK FOR WEB; align: center; width: 2; color: white;">
+        </a-plane>
       </a-entity>
     </a-scene>
 
     <script>
-      const sceneEl = document.querySelector('a-scene');
+      const button = document.querySelector('#link-button');
       const overlay = document.querySelector('#scanning-overlay');
+      const sceneEl = document.querySelector('a-scene');
 
-      // ターゲットが見つかった時の処理
-      sceneEl.addEventListener("targetFound", event => {
-        console.log("ターゲットを認識しました");
+      // 画像を認識した時の処理
+      sceneEl.addEventListener("targetFound", () => {
         overlay.classList.add("hidden");
       });
 
-      // ターゲットを見失った時の処理
-      sceneEl.addEventListener("targetLost", event => {
-        console.log("ターゲットを見失いました");
-        overlay.classList.remove("hidden");
+      // ボタンがクリック（タップ）された時の処理
+      button.addEventListener('click', () => {
+        // ここに飛ばしたいURLを記入してください
+        window.location.href = 'https://www.google.com'; 
       });
     </script>
   </body>
