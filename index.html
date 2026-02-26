@@ -2,23 +2,14 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Quick Redirect</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
-    <style>
-        body { margin: 0; overflow: hidden; }
-        #debug-console {
-            position: fixed; top: 10px; left: 10px; right: 10px;
-            background: rgba(0,0,0,0.8); color: white;
-            padding: 10px; font-family: monospace; z-index: 9999;
-            font-size: 12px; line-height: 1.4; pointer-events: none;
-        }
-    </style>
 </head>
-<body>
-    <div id="debug-console">ログ: 起動中...</div>
+<body style="margin: 0; overflow: hidden;">
 
     <a-scene 
-        mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; uiScanning: no;" 
+        mindar-image="imageTargetSrc: https://asueducation1-ops.github.io/AR-card/targets.mind; autoStart: true; uiScanning: yes;" 
         embedded color-space="sRGB" 
         renderer="colorManagement: true, physicallyCorrectLights" 
         vr-mode-ui="enabled: false" 
@@ -27,37 +18,22 @@
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
         <a-entity id="target0" mindar-image-target="targetIndex: 0">
-            <a-sphere position="0 0 0" radius="1" color="blue" opacity="0.8"></a-sphere>
+            <a-ring color="teal" radius-inner="0.5" radius-outer="0.6" rotation="0 0 0"></a-ring>
         </a-entity>
     </a-scene>
 
     <script>
-        const log = document.getElementById('debug-console');
-        const sceneEl = document.querySelector('a-scene');
-
-        // 1. MindARの初期化状況をチェック
-        sceneEl.addEventListener("arReady", () => {
-            log.innerHTML += "<br>✅ ARシステム起動完了";
-        });
-
-        sceneEl.addEventListener("arError", (e) => {
-            log.innerHTML += "<br>❌ ARエラー: HTTPSまたはカメラ権限を確認してください";
-        });
-
-        // 2. targets.mind が読み込めなかった時のエラーをキャッチ
-        window.addEventListener('error', (e) => {
-            if (e.target.src && e.target.src.includes('targets.mind')) {
-                log.innerHTML += "<br>❌ 重大エラー: targets.mind が見つかりません！パスを確認してください。";
-            }
-        }, true);
-
-        // 3. 認識テスト
         const targetEl = document.querySelector('#target0');
+
+        // 画像を見つけた瞬間に指定のURLへ飛ばす
         targetEl.addEventListener("targetFound", () => {
-            log.innerHTML = "<span style='color:yellow; font-size:20px;'>✨ 認識成功！移動します...</span>";
-            setTimeout(() => {
-                window.location.href = 'https://asueducation1-ops.github.io/AR-card/';
-            }, 500);
+            console.log("Found!");
+            window.location.href = 'https://asueducation1-ops.github.io/AR-card/';
+        });
+
+        // エラーログ（もし読み込めない場合はアラートを出します）
+        document.querySelector('a-scene').addEventListener("arError", (event) => {
+            alert("カメラまたはファイルの読み込みに失敗しました。");
         });
     </script>
 </body>
