@@ -2,23 +2,23 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AR Quick Link</title>
     <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.2/dist/mindar-image-aframe.prod.js"></script>
     <style>
-        body { margin: 0; overflow: hidden; }
-        #indicator {
-            position: fixed; top: 10px; left: 10px; padding: 8px;
-            background: rgba(0,0,0,0.6); color: white;
-            z-index: 999; font-family: sans-serif; font-size: 12px;
+        body { margin: 0; overflow: hidden; background: #000; }
+        #log {
+            position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+            padding: 15px; background: rgba(0,0,0,0.8); color: #0f0;
+            font-family: monospace; font-size: 14px; pointer-events: none;
         }
+        .error { color: #ff4444 !important; background: rgba(50,0,0,0.9) !important; }
     </style>
 </head>
 <body>
-    <div id="indicator">準備中...</div>
+    <div id="log">システム起動中...</div>
 
     <a-scene 
-        mindar-image="imageTargetSrc: https://asueducation1-ops.github.io/AR-card/targets.mind; autoStart: true; uiScanning: yes; filterMinCF:0.0001; filterBeta: 0.001;" 
+        mindar-image="imageTargetSrc: ./targets.mind; autoStart: true; uiScanning: yes;" 
         embedded color-space="sRGB" 
         renderer="colorManagement: true, physicallyCorrectLights" 
         vr-mode-ui="enabled: false" 
@@ -27,31 +27,35 @@
         <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
         <a-entity id="target0" mindar-image-target="targetIndex: 0">
-            <a-ring color="#007bff" radius-inner="0.4" radius-outer="0.5" position="0 0 0"></a-ring>
+            <a-ring color="#007bff" radius-inner="0.5" radius-outer="0.6"></a-ring>
         </a-entity>
     </a-scene>
 
     <script>
+        const log = document.getElementById('log');
+        const targetUrl = 'https://asueducation1-ops.github.io/AR-card/';
+
+        // 1. ファイル読み込みテスト
+        fetch('./targets.mind').then(res => {
+            if (!res.ok) throw new Error("targets.mindが見つかりません(404)");
+            log.innerText = "✅ ファイル読込成功。画像を映してください。";
+        }).catch(err => {
+            log.classList.add('error');
+            log.innerText = "❌ エラー: " + err.message + "\nファイル名が targets.mind か確認してください。";
+        });
+
+        // 2. 認識時の処理
         const targetEl = document.querySelector('#target0');
-        const indicator = document.querySelector('#indicator');
-
-        // システムが起動したかチェック
-        document.querySelector('a-scene').addEventListener("arReady", () => {
-            indicator.innerText = "スキャン中... 画像を映してください";
-        });
-
-        // 画像を見つけた瞬間の処理
         targetEl.addEventListener("targetFound", () => {
-            indicator.style.background = "blue";
-            indicator.innerText = "認識成功！移動中...";
-            // 直接URLへジャンプ
-            window.location.href = 'https://asueducation1-ops.github.io/AR-card/';
+            log.style.background = "blue";
+            log.innerText = "✨ 認識しました！移動します...";
+            window.location.href = targetUrl;
         });
 
-        // 万が一のエラー表示
+        // 3. ブラウザ互換性エラー
         document.querySelector('a-scene').addEventListener("arError", () => {
-            indicator.style.background = "red";
-            indicator.innerText = "エラー: カメラまたは通信に問題があります";
+            log.classList.add('error');
+            log.innerText = "❌ AR起動失敗。SafariかChromeで開き、カメラを許可してください。";
         });
     </script>
 </body>
